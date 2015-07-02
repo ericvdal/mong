@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans 
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" 
+    xmlns="http://www.springframework.org/schema/batch"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+	http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+    
+	<mongo:mongo host="localhost" port="27017"/>
+  
+	<mongo:db-factory dbname="database" mongo-ref="mongo"/>
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:ebook.properties" />
+  
+	<beans:bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+	</beans:bean>
+  
+	<mongo:repositories base-package="ebook.persistance" mongo-template-ref="mongoTemplate"  />
+	
+	<context:component-scan base-package="ebook.ws.client" />
+	<context:component-scan base-package="ebook.service" />
+	
+    <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+     
+   	<beans:bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
+	
+	<!-- Exit code mapping 
+	<beans:bean  class="epost.biz.epo.offers.notification.OfferExitCodeMapper"/>
+	
+	<beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" >
+		<beans:property name="transactionManager" ref="transactionManager" />
+	</beans:bean>
+ 
+    <beans:bean id="jobLauncher"
+        class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <beans:property name="jobRepository" ref="jobRepository" />
+    </beans:bean>
+  
+    <beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+-->
+
+	<!-- Tasklet for TARGETED offer BEGIN 
+
+	<beans:bean id="queryTargetedOffer" class="epost.biz.epo.offers.notification.tasklet.targeted.QueryTargetedOfferTasklet" scope="step">
+		<beans:property name="fetchSize"  value="2"/>
+		<beans:property name="forDeliverOffer" value="FALSE"/>
+	</beans:bean>
+	
+	<beans:bean id="queryTargetedOfferDelivery" class="epost.biz.epo.offers.notification.tasklet.targeted.QueryTargetedOfferTasklet">
+		<beans:property name="fetchSize" value="2"/>
+		<beans:property name="forDeliverOffer" value="TRUE"/>
+	</beans:bean>
+	
+	<beans:bean id="filteringOptIn" class="epost.biz.epo.offers.notification.tasklet.targeted.FilteringOptInTasklet"/>
+	
+	<beans:bean id="verifyTargetedPreferences" class="epost.biz.epo.offers.notification.tasklet.targeted.VerifyTargetedPreferencesTasklet"/>
+	
+	<beans:bean id="sendNotification" class="epost.biz.epo.offers.notification.tasklet.SendNotificationTasklet"/>
+	
+	<beans:bean id="updateNotificationDate" class="epost.biz.epo.offers.notification.tasklet.UpdateNotificationDateTasklet"/>
+		
+	<beans:bean id="targetedOfferDecider" class="epost.biz.epo.offers.notification.tasklet.targeted.DeciderTargetedOffer"/>
+	-->
+	<!-- Tasklet for TARGETED offer END -->
+		
+	
+	<!-- Tasklet for UNTARGETED offer BEGIN 
+	
+	<beans:bean id="queryNewUntargetedDailyOffer" class="epost.biz.epo.offers.notification.tasklet.untargeted.NewDailyOffersTasklet"/>
+	
+	<beans:bean id="getUserFromPreference" class="epost.biz.epo.offers.notification.tasklet.untargeted.GetUserFromPreferenceTasklet">
+		<beans:property name="paginationSize"  value="25"/>
+	</beans:bean>
+	
+	<beans:bean id="checkUntargetedCommFlag" class="epost.biz.epo.offers.notification.tasklet.untargeted.CheckUntargetedCommFlagTasklet"/>
+	-->
+	<!-- Tasklet for UNTARGETED offer END 
+	
+	
+	<beans:bean id="finishNotification" class="epost.biz.epo.offers.notification.tasklet.OfferBatchFinishTasklet"/>	
+	
+	<beans:bean id="batchListener" class="epost.biz.epo.offers.notification.OfferBatchListener"/>
+	
+	
+	<flow id="first_Flow">
+		<step id="filtering_targeted_offer">
+			<tasklet ref="queryTargetedOffer">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+			<next on="*" to="firstTargetedOfferDecision"/>
+		</step>
+		
+		<decision id="firstTargetedOfferDecision" decider="targetedOfferDecider">
+			<end on="COMPLETED" exit-code="COMPLETED"/>
+			<next on="*" to="filtering_opt_in" />
+		</decision>
+		
+		<step id="filtering_opt_in">
+			<tasklet ref="filteringOptIn"/>			
+			<next on="NO_MORE_USER" to="filtering_targeted_offer"/>
+			<next on="CONTINUE" to="verify_targeted_offer"/>
+			<fail on="Q_SERVICE_POSTAL_STATION_DOWN" exit-code="Q_SERVICE_POSTAL_STATION_DOWN"/>
+		</step>
+		
+		<step id="verify_targeted_offer" >
+			<tasklet ref="verifyTargetedPreferences">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<next on="FAILED" to="send_notification"/>
+			<next on="*" to="send_notification"/>
+			<fail on="Q_SERVICE_14_DOWN" exit-code="Q_SERVICE_14_DOWN"/>
+		</step>
+		
+		<step id="send_notification">
+			<tasklet ref="sendNotification"/>
+			<next on="FAILED" to="filtering_targeted_offer"/>
+			<next on="*" to="update_notification_date"/>
+			<fail on="Q_SERVICE_POSTAL_STATION_DOWN" exit-code="Q_SERVICE_POSTAL_STATION_DOWN"/>
+		</step>
+		
+		<step id="update_notification_date">
+			<tasklet ref="updateNotificationDate"/>
+			<next on="*" to="filtering_targeted_offer"/>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+		</step>		
+	</flow>
+
+	
+	<flow id="second_Flow">
+		<step id="filtering_targeted_offer_delivery">
+			<tasklet ref="queryTargetedOfferDelivery">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+			<next on="*" to="deliveryTargetedOfferDecision"/>
+		</step>
+		
+		<decision id="deliveryTargetedOfferDecision" decider="targetedOfferDecider">
+			<end on="COMPLETED" exit-code="COMPLETED"/>
+			<next on="*" to="filtering_opt_in_offer_delivery"/>
+		</decision>
+		
+		<step id="filtering_opt_in_offer_delivery" >
+			<tasklet ref="filteringOptIn"/>
+		 	<next on="NO_MORE_USER" to="filtering_targeted_offer_delivery"/>  
+			<next on="CONTINUE" to="verify_targeted_offer_delivery"/>
+			<fail on="FAILED" exit-code="EARLY TERMINATION"/>
+			<fail on="Q_SERVICE_POSTAL_STATION_DOWN" exit-code="Q_SERVICE_POSTAL_STATION_DOWN"/>
+		</step>		
+		
+		<step id="verify_targeted_offer_delivery" >
+			<tasklet ref="verifyTargetedPreferences">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<stop on="FAILED" restart="filtering_targeted_offer_delivery"/>
+			<next on="*" to="send_notification_delivery"/>
+			<fail on="Q_SERVICE_14_DOWN" exit-code="Q_SERVICE_14_DOWN"/>
+		</step>
+		
+		<step id="send_notification_delivery">
+			<tasklet ref="sendNotification">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<stop on="FAILED" restart="filtering_targeted_offer_delivery"/>
+			<next on="*" to="update_notification_date_delivery"/>
+			<fail on="Q_SERVICE_POSTAL_STATION_DOWN" exit-code="Q_SERVICE_POSTAL_STATION_DOWN"/>
+		</step>
+		
+		<step id="update_notification_date_delivery">
+			<tasklet ref="updateNotificationDate">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<next on="*" to="filtering_targeted_offer_delivery"/>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+		</step>		
+	</flow>
+	-->
+	
+	<!-- From list of offer we get a list of preference and then from the preference we get a list of user
+	if the web service failed we stop the job 
+	
+	<flow id="untargeted_flow">
+		<step id="query_untargeted_daily_offer">
+			<tasklet ref="queryNewUntargetedDailyOffer"/>
+			<next on="OFFER_FOUND" to="get_user_from_preference"/>
+			<end on="NO_OFFER_FOUND" exit-code="COMPLETED"/>
+			<fail on="FAILED" exit-code="EARLY TERMINATION"/>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+		</step>
+		
+		<step id="get_user_from_preference">
+			<tasklet ref="getUserFromPreference"/>
+			<end on="NO_USER_FOUND" exit-code="COMPLETED"/>
+			<end on="OFFER_WEB_SERVICE_DOWN" exit-code="FAILED"/>
+			<next on="*" to="check_untargeted_comm_flag"/>
+			<fail on="Q_SERVICE_14_DOWN" exit-code="Q_SERVICE_14_DOWN"/>
+		</step>		
+		
+		<step id="check_untargeted_comm_flag">
+			<tasklet ref="checkUntargetedCommFlag"/>
+			<next on="*" to="send_notification_untargeted"/>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+		</step>
+		
+		<step id="send_notification_untargeted">
+			<tasklet ref="sendNotification">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<stop on="FAILED" restart="get_user_from_preference"/>
+			<next on="*" to="update_notification_date_untargeted"/>
+			<fail on="Q_SERVICE_POSTAL_STATION_DOWN" exit-code="Q_SERVICE_POSTAL_STATION_DOWN"/>
+		</step>
+		
+		<step id="update_notification_date_untargeted">
+			<tasklet ref="updateNotificationDate">
+				<no-rollback-exception-classes>
+					<include class="epost.biz.control.ControlException"/>
+				</no-rollback-exception-classes>
+			</tasklet>
+			<next on="*" to="get_user_from_preference"/>
+			<fail on="Q_SERVICE_15_DOWN" exit-code="Q_SERVICE_15_DOWN"/>
+		</step>			
+	</flow>
+	
+	<job id="offers_notification_batch">
+		<description>Send SMS/Email for targeted offers</description>	
+		
+		<flow id="launch_firstFlow" parent="first_Flow" next="launch_secondFlow"/>
+		
+		<flow id="launch_secondFlow" parent="second_Flow" next="launch_untargeted_flow"/>		
+		 
+		<flow id="launch_untargeted_flow" parent="untargeted_flow" next="finishUnTargetted"/>
+		
+		<step id="finishUnTargetted">
+			<tasklet ref="finishNotification"/>
+			<end on="COMPLETED" exit-code="COMPLETED"/>
+			<end on="EMAIL_JOB_FAILED" exit-code="EMAIL_JOB_FAILED"/>
+			<end on="SMS_JOB_FAILED"   exit-code="SMS_JOB_FAILED"/>
+			<end on="EMAIL_AND_SMS_JOB_FAILED" exit-code="EMAIL_AND_SMS_JOB_FAILED"/>
+			<end on="OFFER_WEB_SERVICE_DOWN"   exit-code="OFFER_WEB_SERVICE_DOWN"/>
+		</step>
+		
+		<listeners>
+        	<listener ref="batchListener"/>
+   		 </listeners>
+		
+	</job>
+	-->
+</beans:beans>
+	

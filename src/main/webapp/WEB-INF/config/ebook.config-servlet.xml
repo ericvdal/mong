@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns:util="http://www.springframework.org/schema/util" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+   		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd 
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.2.xsd"
+       >
+      <!-- 
+      
+    <bean id="resourceBundleSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    <property name="basenames">
+        <list>
+            <value>org.hibernate.validator.ValidationMessages</value>
+        </list>
+    </property>
+</bean>
+   -->
+   
+   <!-- 
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+    	<property name="locations">  
+        	<list>  
+       			<value>WEB-INF/config/offers.configuration.properties</value>
+       			<value>WEB-INF/config/database.properties</value>
+       		</list>
+       </property>
+	</bean>	
+	
+	<bean class="epost.core.offers2.ApplicationOfferSpringContext"/>
+	
+	<import resource="persistence.offers.application-context.xml"/>  
+ 	 -->
+ 	<context:component-scan base-package="ebook" />
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+     
+   	<bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
+
+	<mvc:annotation-driven >
+	    <mvc:message-converters register-defaults="false">
+	        <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter">
+	            <property name="supportedMediaTypes">
+	                <list>
+	                    <value>image/jpeg</value>
+	                    <value>image/png</value>
+	                    <value>image/gif</value>
+	                </list>
+	            </property>
+	        </bean>
+	 	<bean id="jacksonMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	 <!--   	<property name="objectMapper" ref="customObjectMapper" /> -->
+	    	<property name="supportedMediaTypes">
+                <list>
+                    <bean class="org.springframework.http.MediaType">
+                        <constructor-arg index="0" value="application" />
+                        <constructor-arg index="1" value="vnd.offers.v1+json" />
+                        <constructor-arg index="2" value="UTF-8" />
+                    </bean>
+                    <bean class="org.springframework.http.MediaType">
+                        <constructor-arg index="0" value="application" />
+                        <constructor-arg index="1" value="json" />
+                        <constructor-arg index="2" value="UTF-8" />
+                    </bean>
+                </list>
+            </property>
+	    </bean>
+	    </mvc:message-converters>
+	</mvc:annotation-driven>
+	<!-- 
+<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+<bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor"/>	
+		 -->
+		 <!-- 
+  <bean id="documentationController" class="epost.offers.ws.core.JSONDocController">
+	  		<constructor-arg index='0' value="1.0"/>
+			<constructor-arg index='1' value="https://localhost:8080/offers" />
+			<constructor-arg index='2'>
+			<list>
+		 		<value>epost.offers.ws.controller</value>
+			 <value>epost.offers.ws.model.json</value> 
+			</list>
+			</constructor-arg>
+	</bean>
+	 -->
+<!-- 
+<bean id="http403ForbiddenEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+ 	
+<bean id="offerhttp403ForbiddenEntryPoint" class="epost.offers.ws.core.FailedAuthenticationEntryPoint">
+	<property name="contentType" value="application/vnd.offers.v1+json"/>
+</bean>
+
+<bean id="authUserFilter" class="epost.offers.ws.core.AuthenticationUserGuidFilter"  scope="singleton" />
+<bean id="userAuthProvider" class="epost.offers.ws.core.UserAuthenticationProvider" /> 	
+
+<security:authentication-manager id="userAuthManager"  >
+    <security:authentication-provider ref="userAuthProvider" />
+</security:authentication-manager>
+
+<security:authentication-manager id="anonAuthManager" />
+
+ <security:http pattern="/private/**" authentication-manager-ref="userAuthManager" use-expressions="true" entry-point-ref="offerhttp403ForbiddenEntryPoint">
+   <security:intercept-url pattern="/**"  access="isAuthenticated()"/>
+   <security:custom-filter  ref="authUserFilter" after="BASIC_AUTH_FILTER" /> 
+</security:http>
+ -->
+<!-- UNPROTECTED RESOURCES 
+<security:http pattern="/js/**" security="none"/>
+<security:http pattern="/css/**" security="none"/>
+<security:http pattern="/font/**" security="none"/>
+<security:http pattern="/error/**" security="none"/>
+<security:http pattern="/public/**"  security="none"/>-->
+<!-- /UNPROTECTED RESOURCES 
+
+ <security:http  use-expressions="true" create-session="stateless" authentication-manager-ref="anonAuthManager"  auto-config="false" realm="Restricted Service" entry-point-ref="http403ForbiddenEntryPoint">
+   <security:intercept-url pattern="/public/**" access="allowAll"/>
+   <security:intercept-url pattern="/js/**" access="allowAll"/>
+   <security:intercept-url pattern="/css/**" access="allowAll"/> 
+   <security:intercept-url pattern="/font/**" access="allowAll"/>
+   <security:intercept-url pattern="/error/**" access="allowAll"/>
+   <security:intercept-url pattern="/**" access="denyAll"/>
+</security:http>
+ -->
+   <!-- Declare the Resolver -->
+    <bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
+<!-- 
+   <bean id="controlFactory" class="epost.biz.control.ControlFactory" factory-method="createInstance">
+   <constructor-arg>
+        <list>
+        	<value type="java.io.File">WEB-INF/config/service.offers.biz.controls-config.xml</value>
+        </list>
+ 	</constructor-arg>
+    </bean>
+     -->
+
+   <bean id="log4jInitialization" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass"
+      value="org.springframework.util.Log4jConfigurer" />
+        <property name="targetMethod" value="initLogging" />
+        <property name="arguments">
+            <list>
+                <value>classpath:ebook.log4j-config.xml</value>
+            </list>
+        </property>
+    </bean> 
+<!-- 
+    <bean id="contextApplicationContextProvider" 
+          class="epost.offers.ws.core.SpringAppContextProvider">
+    </bean>
+ -->
+<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+	<property name="mediaTypes">
+		<map>
+			<entry key="html" value="text/html"/>
+			<entry key="json" value="application/json"/>
+		</map>
+	</property>
+	<property name="defaultContentType" value="text/plain;charset=UTF-8"/>
+	<property name="viewResolvers">
+		<list>
+			<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+				<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+				<property name="prefix" value="/WEB-INF/jsp/"/>
+				<property name="suffix" value=".jsp"/>
+			</bean>		
+		</list>
+	</property>
+	<property name="defaultViews">
+		<list>
+			<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+				<property name="prefixJson" value="true"/>
+			<!-- 	<property name="objectMapper" ref="customObjectMapper"/>  -->
+			</bean>
+		</list>
+	</property>
+</bean>
+
+    
+	<mongo:mongo host="localhost" port="27017"/>
+  
+	<mongo:db-factory dbname="database" mongo-ref="mongo"/>
+	<context:annotation-config/>
+	<context:property-placeholder location="classpath:ebook.properties" />
+  
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+	</bean>
+  
+	<mongo:repositories base-package="ebook.persistance" mongo-template-ref="mongoTemplate"  />
+
+
+</beans>

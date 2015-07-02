@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+    <!-- Outputs log information to the standard output/console -->
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %x [%t] %-5p %C{1} %M:%L - %m%n"/>
+        </layout>
+    </appender>
+
+    <!-- Outputs log information to a text file rotating daily -->
+    <appender name="DAILY" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="D:/AppLogs/ebook/ebooks.log"/>
+        <param name="DatePattern" value=".yyyy-MM-dd.HH'.log'"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %x [%t] %-5p %C{1} %M:%L - %m%n"/>
+        </layout>
+    </appender>
+
+
+    <logger name="ebook" additivity="true">
+        <level value="DEBUG"/>
+        <appender-ref ref="DAILY"/>
+    </logger>
+
+
+     <root>
+        <priority value="DEBUG"/>
+        <appender-ref ref="DAILY"/>
+     <!--  <appender-ref ref="STDOUT"/>-->
+    </root>
+
+</log4j:configuration>

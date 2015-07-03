@@ -42,3 +42,13 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /build/
+/bower_components/
+/node_modules/
+/gradle/
+/.gradle/
+/.settings/
+/.classpath
+/.gitignore
+/.project
+/gradlew
+/gradlew.bat

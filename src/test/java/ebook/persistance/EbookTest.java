@@ -83,7 +83,7 @@ public class EbookTest implements ApplicationContextAware{
 		
 
 		try {
-			nbBookCountStart = ebookService.getAllOrder().size();
+			nbBookCountEnd = ebookService.getAllOrder().size();
 			System.out.println ("loaded " +(nbBookCountEnd-nbBookCountStart) + " books");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

@@ -26,15 +26,21 @@ buildscript {
     dependencies {
 	  classpath 'com.bmuschko:gradle-tomcat-plugin:2.2'	  
 	  classpath 'com.moowork.gradle:gradle-node-plugin:0.10'	 
-	  classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.3.7' 
+	//  classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.3.7'
+	classpath "com.eriwen:gradle-js-plugin:1.12.1" 
+	classpath 'com.eriwen:gradle-css-plugin:1.11.1'
 	}
 	
  
 }
 
 apply plugin: 'com.moowork.node'
-apply plugin: 'asset-pipeline'
+apply plugin: 'com.eriwen.gradle.js'
+apply plugin: 'com.eriwen.gradle.css'
+//apply plugin: 'asset-pipeline'
 
+
+/*
 assets {
   minifyJs = true
   minifyCss = true
@@ -50,8 +56,9 @@ assets {
   ]
 
   includes = []
-  excludes = ['**/*.less'] //Example Exclude GLOB pattern
+ // excludes = ['**/  /*.less'] //Example Exclude GLOB pattern
 }
+*/
 //mainClassName = "org.springframework.batch.core.launch.support.CommandLineJobRunner job-read-files.xml mongo-ebook_batch"
 
 jar {
@@ -63,6 +70,79 @@ node {
     version = '0.12.5'
     npmVersion = '2.11.2'
     download = true
+}
+
+def assetSrcDir='src/main/assets'
+
+javascript.source {
+    dev {
+        js {
+            srcDir assetSrcDir
+            include "**/*.js"
+            exclude "**/*.min.js"
+        }
+    }
+    prod {
+        js {
+            srcDir assetSrcDir
+            include "**/*.min.js"
+        }
+    }
+}
+
+css.source {
+    dev {
+        
+        css {
+            srcDir assetSrcDir
+            include "**/*.css"
+            exclude "**/*.min.css"        
+        }
+    }
+    prod {
+        
+        css {
+            srcDir assetSrcDir
+            include "**/*.min.css"        
+        }
+    }
+}
+
+task myCombineJs(type: org.gradle.api.tasks.SourceTask) {
+	def encoding = 'UTF-8'
+	source = javascript.source.dev.js.files
+
+	def dest = file("${buildDir}/assets/all.js")
+	ant.concat(destfile: (dest as File).canonicalPath, fixlastline: 'yes', encoding: encoding) {
+		source.files.each {
+			logger.info("Adding to fileset: ${it}")
+			fileset(file: it)
+		}
+	}
+}
+
+task myCombineCss(type: org.gradle.api.tasks.SourceTask) {
+	def encoding = 'UTF-8'
+	source = css.source.dev.css.files
+
+	def dest = file("${buildDir}/assets/all.css")
+	ant.concat(destfile: (dest as File).canonicalPath, fixlastline: 'yes', encoding: encoding) {
+		source.files.each {
+			logger.info("Adding to fileset: ${it}")
+			fileset(file: it)
+		}
+	}
+}
+
+// Create new CombineJsTasks if you have multiple sets of JS files
+task jsDev(type: com.eriwen.gradle.js.tasks.CombineJsTask) {
+    source = ["${projectDir}/js/file1.js", "${projectDir}/js/file2.js"]
+    dest = file("${buildDir}/all-debug.js")
+}
+
+task jsProd(type: com.eriwen.gradle.js.tasks.CombineJsTask) {
+    source = ["${projectDir}/js/file1.js", "${projectDir}/js/file2.js"]
+    dest = file("${buildDir}/all.js")
 }
 
 repositories {
@@ -119,8 +199,10 @@ task bowerPackages() {
     dependsOn bowerSyncJavascript, bowerSyncStylesheets
 }
 
-processResources.dependsOn bowerPackages
-assetCompile.dependsOn bowerPackages
+processResources.dependsOn myCombineJs, myCombineCss, bowerPackages
+//assetCompile.dependsOn bowerPackages
+
+
 
 dependencies {
 	def tomcatVersion = '7.0.59'
@@ -130,18 +212,17 @@ dependencies {
 }
 
 dependencies {
-  compile 'org.codehaus.groovy:groovy:2.0.7'
-  compile 'org.codehaus.groovy:groovy-templates:2.0.7'
+  compile 'org.codehaus.groovy:groovy:2.4.3'
+  compile 'org.codehaus.groovy:groovy-templates:2.4.3'
 
-	compile 'com.fasterxml.jackson.core:jackson-databind:2.4.0'
-	compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
+	compile 'org.springframework:spring-webmvc:4.1.7.RELEASE'
 	compile 'org.apache.httpcomponents:httpclient:4.5'
-    compile 'org.springframework.data:spring-data-mongodb:1.7.0.RELEASE'
-    compile 'org.springframework:spring-test:4.1.6.RELEASE'
+    compile 'org.springframework.data:spring-data-mongodb:1.7.1.RELEASE'
+    compile 'org.springframework:spring-test:4.1.7.RELEASE'
 	compile 'org.springframework.batch:spring-batch-core:3.0.4.RELEASE'
-	compile 'org.springframework:spring-oxm:4.1.6.RELEASE'
+	compile 'org.springframework:spring-oxm:4.1.7.RELEASE'
 	compile 'commons-beanutils:commons-beanutils:1.9.2'
-//	compile 'log4j:log4j:1.2.17'
 	compile 'org.slf4j:slf4j-log4j12:1.7.12'
 	
 	
@@ -149,7 +230,14 @@ dependencies {
     testCompile 'org.powermock:powermock-api-easymock:1.5.5'
 }
 
-task wrapper(type: Wrapper) {
+war {
+	 from( "${buildDir}/assets", {
+        into '/assets'
+    })
+
+}
+
+task wrapp(type: Wrapper) {
     gradleVersion = '2.5-rc-1'
 }
 

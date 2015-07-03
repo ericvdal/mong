@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 public interface EbookRepository extends MongoRepository<Ebook, String>{
 
     public Ebook findByTitle(String title);
-
+    
+    public List<Ebook> findByCategories(String category);
+    
 	public List<Ebook> findByOrderByTitleAsc();
     
 }

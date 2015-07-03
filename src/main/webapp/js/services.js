@@ -9,8 +9,17 @@ ebookService.factory('Ebook', ['$resource',
   */
   
   angular.module('ebookApp.services', ['ngResource'])
-  .factory('EbookService', function($resource){
+ 
+  .factory('AllEbooks', function($resource){
     return $resource('http://localhost:8080/mong2/getall', {})
   })
-  .value('version', '0.1');
   
+  .factory('EbooksByCategory', function($resource){
+    return $resource('http://localhost:8080/mong2/getall', {})
+  })
+  
+  .factory('AllCategory', function($resource){
+    return $resource('http://localhost:8080/mong2/category_list', {})
+  })  
+  
+  .value('version', '0.1');

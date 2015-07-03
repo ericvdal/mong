@@ -1,6 +1,7 @@
 package ebook.persistance;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ebook.service.APILimitException;
+import ebook.service.EbookCategoryService;
 import ebook.service.EbookResources;
 import ebook.service.EbookService;
 
@@ -27,9 +29,7 @@ import ebook.service.EbookService;
 public class EbookTest implements ApplicationContextAware{
 	
 	private ApplicationContext applicationContext;
-	
-	@Autowired
-	private EbookResources ebookResources;
+
 	
 	@Autowired
 	private EbookRepository repository;
@@ -37,11 +37,16 @@ public class EbookTest implements ApplicationContextAware{
 	@Autowired
 	private EbookService ebookService;
 	
+	@Autowired
+	private EbookCategoryService categoryService;
+	
 	@Test
 	public void testSearch(){
 		List<Ebook> ebookList = repository.findAll();
 		Assert.assertTrue(ebookList == null || ebookList.isEmpty());
 	}
+	
+	
 	
 	@Test
 	public void testService(){
@@ -49,8 +54,12 @@ public class EbookTest implements ApplicationContextAware{
 		int nbBookCountStart = 0;
 		int nbBookCountEnd = 0;
 		try {
-			String str="";
+			
 			nbBookCountStart = ebookService.getAllOrder().size();
+			
+			List<String> searchList = ebookService.getListCategoryParam();
+			/*
+			String str="";
 			List<String> searchList = new ArrayList<String>();
 			Resource resource = ebookResources.getEbookResource();
 			InputStream inputStream = resource.getInputStream();
@@ -66,7 +75,7 @@ public class EbookTest implements ApplicationContextAware{
 			    } finally {
 			        try { inputStream.close(); } catch (Throwable ignore) {}
 			    }
-			
+			*/
 			while(true){ 
 				isServiceOk = ebookService.populateEbook(searchList);
 			}
@@ -93,6 +102,9 @@ public class EbookTest implements ApplicationContextAware{
 		Assert.assertTrue(isServiceOk);
 	}
 
+	
+	
+	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
@@ -125,6 +137,39 @@ public class EbookTest implements ApplicationContextAware{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void test_getByCategory() {
+		try {
+			List<String> categoryParamList = ebookService.getListCategoryParam();
+			
+			if (categoryParamList != null){
+				
+				EbookCategory ebookCategory = null;
+				
+				while(ebookCategory == null){
+					Double ran =  (Math.random() * categoryParamList.size());
+					
+					String randomCategory = categoryParamList.get(ran.intValue());
+						
+					ebookCategory = categoryService.getEbookCategory(randomCategory);
+					
+				}
+				
+		
+				List<Ebook> ebookList = ebookService.getByCategory(ebookCategory);
+				
+				Assert.assertTrue(ebookList != null && ebookList.size() > 0);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
+		
 	}
 	
 }

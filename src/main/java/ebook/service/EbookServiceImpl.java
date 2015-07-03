@@ -1,5 +1,9 @@
 package ebook.service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -39,6 +44,9 @@ public class EbookServiceImpl implements EbookService {
 
 	@Autowired
 	private EbookCategoryService ebookCategoryService;
+	
+	@Autowired
+	private EbookResources ebookResources;
 	
 	private int nbQuery = 0;
 	
@@ -100,6 +108,13 @@ public class EbookServiceImpl implements EbookService {
 
 		return repository.findByOrderByTitleAsc();
 	}
+	
+	
+	@Override
+	public List<Ebook> getByCategory(EbookCategory category) throws InterruptedException {
+		return repository.findByCategories(category.getCategory());
+	}
+
 	
 	private boolean processEbookSearch(String searchParameter, int numPage) throws InterruptedException, APILimitException {
 		System.out.println("Numpage = " + numPage);
@@ -204,6 +219,28 @@ public class EbookServiceImpl implements EbookService {
 		}
 	}
 
+	@Override
+	public List<String> getListCategoryParam() throws IOException {
+		String str="";
+		List<String> searchList = new ArrayList<String>();
+		Resource resource = ebookResources.getEbookResource();
+		InputStream inputStream = resource.getInputStream();
+		 try {
+		        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		        if (inputStream!=null) {                         
+		            while ((str = reader.readLine()) != null) { 
+		            	if (!str.isEmpty()){
+		            		searchList.add(str);
+		            	}
+		            }               
+		        }
+		    } finally {
+		        try { inputStream.close(); } catch (Throwable ignore) {}
+		    }
+		 return searchList;
+	}
+
+	
 	
 
 	

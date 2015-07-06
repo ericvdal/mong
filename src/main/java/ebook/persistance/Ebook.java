@@ -32,7 +32,8 @@ public class Ebook implements Serializable{
     private String download;
     private List<String> categories;
     
-    private Ebook(){
+    @SuppressWarnings("unused")
+	private Ebook(){
     	
     }
 

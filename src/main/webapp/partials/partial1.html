@@ -1,25 +1,30 @@
 <h1 class="lead">AngularJS GitHub Ebook</h1>
 
-
-
+<select ng-model="selectedCategory" ng-options="item.category as item.category for item in data.categories">
+    <option value="">Select Category</option>
+</select>
 
 <div class="well" ng-show="data.ebooks != null">
-<table class="table table-striped table-bordered">
-  <tr>
-    <th>Title</th>
-    <th>Subtitle</th>
-    <th>Description</th>
-    <th>Isbn</th>
-    <th>Image</th>
-  </tr>
-  <tr ng-repeat="ebook in data.ebooks">
-    <td>{{ebook.Title}}</td>
+<!--<table class="table table-striped table-bordered">-->
+  <table border="0" class="span12 table table-condensed" style="margin-left:0px" id="tblData">
+    <thead>  
+      <tr>
+        <th>Title</th>
+        <th>Subtitle</th>
+        <th>Description</th>
+        <th>Isbn</th>
+        <th>Image</th>
+      </tr>
+  </thead>
+  <tbody id="allRows">
+  <tr ng-repeat="ebook in data.ebooks  | filter:selectedCategory" ng-style="myStyle"  ng-class="highlightclass" ng-mouseenter="highlightclass='highlight'" ng-mouseleave="highlightclass=''">
+    <td ng-click="myStyle={'background-color':'#cccccc'};">{{ebook.Title}}</td>
     <td>{{ebook.SubTitle}}</td>
     <td>{{ebook.Description}}</td>
     <td>{{ebook.Isbn}}</td>
-    <td>{{ebook.Image}}</td>
+    <td> {{ebook.Image}} </td>
   </tr>
-
+</tbody>
 </table>
 </div>
 

@@ -1,7 +1,6 @@
 package ebook.persistance;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 import org.springframework.data.annotation.Id;
@@ -34,6 +33,7 @@ public class EbookCategory implements Serializable {
 	
 	private Integer nbActualPage;
 	
+	@SuppressWarnings("unused")
 	private EbookCategory(){
 		
 	}

@@ -6,16 +6,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.mongodb.DBObject;
-
-import org.springframework.data.domain.Sort;
 import org.apache.commons.beanutils.BeanComparator;
-import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
-public class SortingMongoEventListener extends AbstractMongoEventListener {
+import com.mongodb.DBObject;
+
+public class SortingMongoEventListener extends AbstractMongoEventListener<Object> {
 	@Override
 	  public void onAfterConvert(DBObject dbo, final Object source) {
 	      ReflectionUtils.doWithFields(source.getClass(), new SortingFieldCallback(source, SortPhase.AFTER_CONVERT));

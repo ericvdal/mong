@@ -1,13 +1,4 @@
-/*var ebookService = angular.module('ebookServices', ['ngResource']);
-
-ebookService.factory('Ebook', ['$resource',
-  function($resource){
-    return $resource('mongo-ebook/getall', {}, {
-      query: {method:'GET', isArray:true}
-    });
-  }]);
-  */
-  
+ 
   angular.module('ebookApp.services', ['ngResource'])
  
   .factory('AllEbooks', function($resource){
@@ -15,7 +6,7 @@ ebookService.factory('Ebook', ['$resource',
   })
   
   .factory('EbooksByCategory', function($resource){
-    return $resource('http://localhost:8080/mong2/getall', {})
+    return $resource('http://localhost:8080/mong2/get_by_category/:category', {category : '@magCategory'})
   })
   
   .factory('AllCategory', function($resource){

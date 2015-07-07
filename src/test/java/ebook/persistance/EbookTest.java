@@ -1,11 +1,7 @@
 package ebook.persistance;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -15,13 +11,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ebook.service.APILimitException;
 import ebook.service.EbookCategoryService;
-import ebook.service.EbookResources;
 import ebook.service.EbookService;
 
 @RunWith(SpringJUnit4ClassRunner.class)

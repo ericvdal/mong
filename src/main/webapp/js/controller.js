@@ -20,7 +20,21 @@ angular.module('ebookApp.controllers', [])
 
 }])
 
+ .controller('ebookController', ['$scope', function($scope) {
+    console.log('control ebook');
+    // Instantiate an object to store your scope data in (Best Practices)
+ //   $scope.img = $scope.data.ebook.image;
+ 
+    
+    $scope.showImageBook = function(ebook) {
+    	$scope.img = ebook.Image;
+    }
+    
+    $scope.hideImageBook = function(ebook) {
+    	$scope.img = "";
+    }
 
+ }])
     
 
   /*

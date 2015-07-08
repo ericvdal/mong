@@ -13,14 +13,18 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
+import com.mongodb.DBObject;
 
 import ebook.json.DetailEbookJson;
 import ebook.json.EbookJson;
 import ebook.json.SearchEbookListJSon;
 import ebook.persistance.Ebook;
 import ebook.persistance.EbookCategory;
+import ebook.persistance.EbookDAO;
 import ebook.persistance.EbookRepository;
 import ebook.ws.client.WsEbookClient;
 
@@ -47,6 +51,9 @@ public class EbookServiceImpl implements EbookService {
 	
 	@Autowired
 	private EbookResources ebookResources;
+	
+	@Autowired
+	private EbookDAO ebookDao;
 	
 	private int nbQuery = 0;
 	
@@ -115,6 +122,24 @@ public class EbookServiceImpl implements EbookService {
 		return repository.findByCategories(category.getCategory());
 	}
 
+	
+	@Override
+	public List<Ebook> getByCategoryOrderedByTile(EbookCategory category) throws InterruptedException {
+
+		System.out.println("Sort By Ebook Type [Ascending] -----------------");
+		
+		Query query = new Query();
+		String cat = category.getCategory();
+		query.addCriteria(new Criteria().where("categories").is(cat));
+		query.with(new Sort(Sort.Direction.ASC,"title")) ;   
+		List<Ebook> ebooks = ebookDao.sortByQuery(query);
+		
+		for (Ebook ebook : ebooks) {
+		    System.out.println(ebook);    
+		}
+		
+		return ebooks;
+	}
 	
 	private boolean processEbookSearch(String searchParameter, int numPage) throws InterruptedException, APILimitException {
 		System.out.println("Numpage = " + numPage);
@@ -239,6 +264,8 @@ public class EbookServiceImpl implements EbookService {
 		    }
 		 return searchList;
 	}
+
+	
 
 	
 	

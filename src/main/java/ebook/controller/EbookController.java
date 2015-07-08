@@ -77,7 +77,7 @@ public class EbookController {
 			EbookCategory ebookcategory = ebookCategoryService.getEbookCategory(category);
 			
 			if (ebookcategory != null){
-				List<Ebook> ebookList = ebookService.getByCategory(ebookcategory);
+				List<Ebook> ebookList = ebookService.getByCategoryOrderedByTile(ebookcategory);
 				
 				if (ebookList != null){
 					for (Ebook ebook:ebookList){

@@ -17,6 +17,9 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
     
+    
+	<context:component-scan base-package="ebook.persistance" />
+    
 	<mongo:mongo host="localhost" port="27017"/>
   
 	<mongo:db-factory dbname="database" mongo-ref="mongo"/>
@@ -26,6 +29,8 @@
 	<beans:bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
 	</beans:bean>
+	
+	
   
 	<mongo:repositories base-package="ebook.persistance" mongo-template-ref="mongoTemplate"  />
 	

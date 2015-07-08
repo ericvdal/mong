@@ -166,4 +166,38 @@ public class EbookTest implements ApplicationContextAware{
 		
 	}
 	
+	
+	@Test
+	public void test_getByCategoryOrdered() {
+		try {
+			List<String> categoryParamList = ebookService.getListCategoryParam();
+			
+			if (categoryParamList != null){
+				
+				EbookCategory ebookCategory = null;
+				
+				while(ebookCategory == null){
+					Double ran =  (Math.random() * categoryParamList.size());
+					
+					String randomCategory = categoryParamList.get(ran.intValue());
+						
+					ebookCategory = categoryService.getEbookCategory(randomCategory);
+					
+				}
+				
+		
+				List<Ebook> ebookList = ebookService.getByCategoryOrderedByTile(ebookCategory);
+				
+				Assert.assertTrue(ebookList != null && ebookList.size() > 0);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
+		}
+		
+	}
+	
 }

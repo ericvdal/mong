@@ -20,4 +20,7 @@ public interface EbookService {
 	
 	public List<String> getListCategoryParam() throws IOException;
 	
+
+	public List<Ebook> getByCategoryOrderedByTile(EbookCategory category) throws InterruptedException;
+	
 }

@@ -42,11 +42,12 @@ public class Ebook implements Serializable{
     	if (categories == null){
     		categories = new ArrayList<String>();
     		categories.add(category);
+    		update = true;
     	}
-    	if (category != null && categories.contains(category)){
+    	if (category != null && !categories.contains(category)){
     		categories.add(category);
+    		update = true;
     	}
-    	
     	
     	return update;
     }

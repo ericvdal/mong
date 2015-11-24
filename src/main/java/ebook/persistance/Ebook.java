@@ -30,6 +30,8 @@ public class Ebook implements Serializable{
     private String publisher;
     private String image;
     private String download;
+    private Boolean downloaded;
+    
     private List<String> categories;
     
     @SuppressWarnings("unused")
@@ -54,7 +56,7 @@ public class Ebook implements Serializable{
     
     public Ebook(String id, String title, String subtitle, String description,
 			String author, String iSBN, String year, String page,
-			String publisher, String image, String download, List<String> categories) {
+			String publisher, String image, String download, List<String> categories, Boolean downloaded) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -68,6 +70,7 @@ public class Ebook implements Serializable{
 		this.image = image;
 		this.download = download;
 		this.categories = categories;
+		this.downloaded = downloaded;
 	}
     
     @Override
@@ -123,5 +126,16 @@ public class Ebook implements Serializable{
 
 	public List<String> getCategories() {
 		return categories;
+	}
+	
+	public Boolean getDownloaded() {
+		if (downloaded == null || downloaded == false)
+			return false;
+		else
+			return true;
+	}
+	
+	public void setDownloaded (Boolean downloaded) {
+		this.downloaded = downloaded;
 	}
 }

@@ -43,6 +43,9 @@ public class DetailEbookJson {
 	
 	@JsonProperty("Download")
 	private String download;
+	
+	@JsonProperty("Downloaded")
+	private Boolean downloaded;
 
 	/**
 	 * @return the id
@@ -135,5 +138,7 @@ public class DetailEbookJson {
 		return download;
 	}
 	
-	
+	public Boolean getDownloaded() {
+		return downloaded;
+	}
 }

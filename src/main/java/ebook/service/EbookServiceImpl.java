@@ -1,6 +1,7 @@
 package ebook.service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,13 +12,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.DBObject;
+import com.google.common.io.Files;
 
 import ebook.json.DetailEbookJson;
 import ebook.json.EbookJson;
@@ -39,6 +41,8 @@ public class EbookServiceImpl implements EbookService {
 	
 	private static final Integer MAX_PAGE = 100;
 	
+	@Value("#{ebookConfigProp[fileLocation]}")
+	public String fileLocation;
 	
 	@Autowired
 	WsEbookClient wsEbookClient;
@@ -213,7 +217,7 @@ public class EbookServiceImpl implements EbookService {
 					String download = detailEbook.getDownload();
 					List<String> categorieList = new ArrayList<String>();
 					categorieList.add(searchParameter);
-					Ebook ebook = new Ebook(id, title, subtitle, description, author, isbn, year, page, publisher, image, download, categorieList);
+					Ebook ebook = new Ebook(id, title, subtitle, description, author, isbn, year, page, publisher, image, download, categorieList, false);
 					repository.insert(ebook);
 				}
 				
@@ -263,6 +267,37 @@ public class EbookServiceImpl implements EbookService {
 		        try { inputStream.close(); } catch (Throwable ignore) {}
 		    }
 		 return searchList;
+	}
+
+	@Override
+	public void saveFileEbook(Ebook ebook) throws InterruptedException, IOException {
+		File ebookFile = new File(fileLocation+ebook.getTitle().replace("/", "-").replace("?", "").replace(":", "")+".pdf");
+		if (!ebook.getDownloaded() || ebook.getDownloaded() == null || !ebookFile.exists()){
+			
+			System.out.println(ebook.getTitle() +" need to be SAVED");
+			
+			
+			if (ebook.getTitle() == null){
+				repository.delete(ebook);
+			}
+			
+			if (!ebookFile.exists() && ebook.getTitle() != null 
+					&& ebook.getDownload() != null){
+				
+				byte[] streamFile = wsEbookClient.loadPdfFile(ebook.getDownload());
+				Files.write(  streamFile,ebookFile);
+				
+				System.out.println("we saved " + ebookFile.toString());
+				ebook.setDownloaded(true);
+				repository.save(ebook);
+				
+			}
+			else {
+				ebook.setDownloaded(true);
+				repository.save(ebook);
+				System.out.println("file " + ebook.getTitle() +" already saved");
+			}
+		}
 	}
 
 	

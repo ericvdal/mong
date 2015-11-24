@@ -212,18 +212,19 @@ dependencies {
 }
 
 dependencies {
-  compile 'org.codehaus.groovy:groovy:2.4.3'
-  compile 'org.codehaus.groovy:groovy-templates:2.4.3'
+  compile 'org.codehaus.groovy:groovy:'+groovyRelease
+  compile 'org.codehaus.groovy:groovy-templates:'+groovyRelease
 
-	compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
-	compile 'org.springframework:spring-webmvc:4.1.7.RELEASE'
+	compile 'com.fasterxml.jackson.core:jackson-databind:'+jacksonRelease
+	compile 'org.springframework:spring-webmvc:'+springRelease
 	compile 'org.apache.httpcomponents:httpclient:4.5'
-    compile 'org.springframework.data:spring-data-mongodb:1.7.1.RELEASE'
-    compile 'org.springframework:spring-test:4.1.7.RELEASE'
-	compile 'org.springframework.batch:spring-batch-core:3.0.4.RELEASE'
-	compile 'org.springframework:spring-oxm:4.1.7.RELEASE'
+    compile 'org.springframework.data:spring-data-mongodb:'+springDataMongo
+    compile 'org.springframework:spring-test:'+springRelease
+	compile 'org.springframework.batch:spring-batch-core:'+springBatchRelease
+	compile 'org.springframework:spring-oxm:'+springRelease
 	compile 'commons-beanutils:commons-beanutils:1.9.2'
 	compile 'org.slf4j:slf4j-log4j12:1.7.12'
+	compile 'com.google.guava:guava:19.0-rc2'
 	
 	
     testCompile 'junit:junit:4.+'
@@ -238,9 +239,10 @@ war {
 }
 
 task wrapp(type: Wrapper) {
-    gradleVersion = '2.5-rc-1'
+    gradleVersion  = gradleVer
 }
 
+//tasks.tomcatRun.dependsOn(tomcatStop)
 
 tomcat {
 	httpPort = 8080

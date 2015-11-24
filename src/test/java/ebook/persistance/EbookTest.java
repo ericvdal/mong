@@ -117,7 +117,8 @@ public class EbookTest implements ApplicationContextAware{
 			
 			if (ebookList != null){
 				for (Ebook ebook:ebookList){
-					System.out.println(ebook.getTitle());
+			//		System.out.println(ebook.getTitle());
+					ebookService.saveFileEbook(ebook);
 					nbBookFound++;
 				}
 			}
@@ -127,10 +128,11 @@ public class EbookTest implements ApplicationContextAware{
 			
 			System.out.println(nbBookFound + " ebooks Found in " + new Long(date2.getTime() - date1.getTime()) + " ms");
 			
-		} catch (InterruptedException e) {
+		} catch (InterruptedException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
 	@Test

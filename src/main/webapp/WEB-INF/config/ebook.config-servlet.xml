@@ -50,6 +50,9 @@
      
    	<bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
 
+
+	<util:properties id="ebookConfigProp" location="classpath:ebook.config.properties" />
+
 	<mvc:annotation-driven >
 	    <mvc:message-converters register-defaults="false">
 	        <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter">
@@ -163,12 +166,14 @@
     </bean>
  -->
 <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+	<!-- 
 	<property name="mediaTypes">
 		<map>
 			<entry key="html" value="text/html"/>
 			<entry key="json" value="application/json"/>
 		</map>
 	</property>
+	-->
 	<property name="defaultContentType" value="text/plain;charset=UTF-8"/>
 	<property name="viewResolvers">
 		<list>

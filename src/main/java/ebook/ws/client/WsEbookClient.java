@@ -8,4 +8,6 @@ public interface WsEbookClient {
 	public SearchEbookListJSon getEbookList(String parameter, Integer numPage);
 	
 	public DetailEbookJson getEbook(String id);
+	
+	public byte[] loadPdfFile(String url);
 }

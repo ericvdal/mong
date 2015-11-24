@@ -23,4 +23,6 @@ public interface EbookService {
 
 	public List<Ebook> getByCategoryOrderedByTile(EbookCategory category) throws InterruptedException;
 	
+	public void saveFileEbook(Ebook ebook)  throws InterruptedException, IOException;
+	
 }

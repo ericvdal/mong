@@ -34,6 +34,9 @@
   
 	<mongo:repositories base-package="ebook.persistance" mongo-template-ref="mongoTemplate"  />
 	
+	
+	<util:properties id="ebookConfigProp" location="classpath:ebook.config.properties" />
+	
 	<context:component-scan base-package="ebook.ws.client" />
 	<context:component-scan base-package="ebook.service" />
 	

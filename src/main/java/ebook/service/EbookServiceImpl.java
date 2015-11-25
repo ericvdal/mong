@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -271,33 +273,47 @@ public class EbookServiceImpl implements EbookService {
 
 	@Override
 	public void saveFileEbook(Ebook ebook) throws InterruptedException, IOException {
-		File ebookFile = new File(fileLocation+ebook.getTitle().replace("/", "-").replace("?", "").replace(":", "")+".pdf");
-		if (!ebook.getDownloaded() || ebook.getDownloaded() == null || !ebookFile.exists()){
-			
-			System.out.println(ebook.getTitle() +" need to be SAVED");
-			
-			
-			if (ebook.getTitle() == null){
-				repository.delete(ebook);
-			}
-			
-			if (!ebookFile.exists() && ebook.getTitle() != null 
-					&& ebook.getDownload() != null){
-				
-				byte[] streamFile = wsEbookClient.loadPdfFile(ebook.getDownload());
-				Files.write(  streamFile,ebookFile);
-				
-				System.out.println("we saved " + ebookFile.toString());
-				ebook.setDownloaded(true);
-				repository.save(ebook);
-				
-			}
-			else {
-				ebook.setDownloaded(true);
-				repository.save(ebook);
-				System.out.println("file " + ebook.getTitle() +" already saved");
-			}
+		if (ebook.getTitle() == null){
+			repository.delete(ebook);
 		}
+		else {
+			File ebookFile = new File(fileLocation+ebook.getTitle().replace("/", "-").replace("?", "").replace(":", "")+".pdf");
+			if (!ebook.getDownloaded() || ebook.getDownloaded() == null || !ebookFile.exists()){
+				
+				System.out.println(ebook.getTitle() +" need to be SAVED");
+				
+				
+				
+				if (!ebookFile.exists() && ebook.getTitle() != null 
+						&& ebook.getDownload() != null){
+					
+					LocalDateTime localDateTimeStart = LocalDateTime.now();
+					
+					byte[] streamFile = wsEbookClient.loadPdfFile(ebook.getDownload());
+					Files.write(  streamFile,ebookFile);
+					
+					ebook.setDownloaded(true);
+					repository.save(ebook);
+					
+					LocalDateTime localDateTimeEnd = LocalDateTime.now();
+					
+
+					Duration  duration  = Duration .between(localDateTimeStart, localDateTimeEnd);
+
+					long siz = streamFile.length;
+					long durSec = duration.getSeconds();
+					
+					System.out.println("we saved " + ebookFile.toString() + " size: " + siz + "bytes in " + duration.getSeconds() + "seconds @ " +  siz/durSec/1024 + "kb/s");
+									
+				}
+				else {
+					ebook.setDownloaded(true);
+					repository.save(ebook);
+					System.out.println("file " + ebook.getTitle() +" already saved");
+				}
+			}			
+		}
+
 	}
 
 	

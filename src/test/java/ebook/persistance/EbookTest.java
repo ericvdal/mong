@@ -117,9 +117,10 @@ public class EbookTest implements ApplicationContextAware{
 			
 			if (ebookList != null){
 				for (Ebook ebook:ebookList){
-			//		System.out.println(ebook.getTitle());
+	
 					ebookService.saveFileEbook(ebook);
 					nbBookFound++;
+					
 				}
 			}
 

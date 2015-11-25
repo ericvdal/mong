@@ -6,26 +6,29 @@ apply plugin: 'idea'
 apply plugin: 'war'
 apply plugin: 'maven'
 apply plugin: 'com.bmuschko.tomcat'
-//apply plugin: 'com.moowork.node'
+apply plugin: 'com.moowork.node'
 
 
 
 buildscript {
 
     repositories {
-        maven { url "http://repo.spring.io/libs-release" }
+//        maven { url "http://repo.spring.io/libs-release" }
+
+		maven { url "http://repo1.maven.org/maven2" }
+		maven { url "http://repo.spring.io/libs-release" }
 	/*    maven {
 	      	url "https://plugins.gradle.org/m2/"
 	    }
 	    */
         mavenLocal()
-        mavenCentral()
+ //       mavenCentral()
     }
   
 	
     dependencies {
 	  classpath 'com.bmuschko:gradle-tomcat-plugin:2.2'	  
-	  classpath 'com.moowork.gradle:gradle-node-plugin:0.10'	 
+	  classpath 'com.moowork.gradle:gradle-node-plugin:0.11'	 
 	//  classpath 'com.bertramlabs.plugins:asset-pipeline-gradle:2.3.7'
 	classpath "com.eriwen:gradle-js-plugin:1.12.1" 
 	classpath 'com.eriwen:gradle-css-plugin:1.11.1'

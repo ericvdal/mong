@@ -302,9 +302,9 @@ public class EbookServiceImpl implements EbookService {
 
 					long siz = streamFile.length;
 					long durSec = duration.getSeconds();
-					
-					System.out.println("we saved " + ebookFile.toString() + " size: " + siz + "bytes in " + duration.getSeconds() + "seconds @ " +  siz/durSec/1024 + "kb/s");
-									
+					if (siz > 0){
+						System.out.println("we saved " + ebookFile.toString() + " size: " + siz + "bytes in " + duration.getSeconds() + "seconds @ " +  siz/durSec/1024 + "kb/s");
+					}	
 				}
 				else {
 					ebook.setDownloaded(true);

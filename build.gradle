@@ -149,9 +149,11 @@ task jsProd(type: com.eriwen.gradle.js.tasks.CombineJsTask) {
 }
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+    maven { url "http://repo1.maven.org/maven2" }
     maven { url "http://repo.spring.io/libs-release" }
+    mavenLocal()
+	//	maven { url "http://repo.spring.io/libs-release" }
+   // mavenCentral()
 }
 
 task npmCacheConfig(type: NpmTask) {

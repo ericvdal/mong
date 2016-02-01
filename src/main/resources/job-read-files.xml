@@ -42,6 +42,8 @@
 	
     <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
      
+     
+     
    	<beans:bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
 	
 	<!-- Exit code mapping 

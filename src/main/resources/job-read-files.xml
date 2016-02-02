@@ -30,10 +30,7 @@
 		<beans:constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
 	</beans:bean>
 	
-	
-  
 	<mongo:repositories base-package="ebook.persistance" mongo-template-ref="mongoTemplate"  />
-	
 	
 	<util:properties id="ebookConfigProp" location="classpath:ebook.config.properties" />
 	
@@ -42,9 +39,21 @@
 	
     <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
      
-     
-     
-   	<beans:bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
+   	<beans:bean id="jacksonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"  />
+   	
+
+	<beans:bean
+    class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+    <beans:property name="messageConverters">
+        <beans:list>
+            <beans:bean
+                class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <beans:property name="objectMapper" ref="jacksonObjectMapper" />
+            </beans:bean>
+        </beans:list>
+    </beans:property>
+</beans:bean>
+	
 	
 	<!-- Exit code mapping 
 	<beans:bean  class="epost.biz.epo.offers.notification.OfferExitCodeMapper"/>

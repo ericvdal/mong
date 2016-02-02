@@ -11,7 +11,7 @@
 
     <!-- Outputs log information to a text file rotating daily -->
     <appender name="DAILY" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="D:/AppLogs/ebook/ebooks.log"/>
+        <param name="File" value="ebooks.log"/>
         <param name="DatePattern" value=".yyyy-MM-dd.HH'.log'"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d %x [%t] %-5p %C{1} %M:%L - %m%n"/>
